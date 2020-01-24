@@ -21,7 +21,7 @@ var viewCloud = function (ctx, coordX, coordY, color) {
   ctx.fillRect(coordX, coordY, CLOUD_WIDTH, CLOUD_HEIGHT);
 };
 
-var drawRect = function (ctx, names, times, i) {
+var drawRect = function (ctx, names, time, i) {
 
   ctx.fillStyle = 'rgba(255, 0, 0, 1)';
 
@@ -29,7 +29,7 @@ var drawRect = function (ctx, names, times, i) {
     ctx.fillStyle = 'hsl(240, ' + shiftSaturation * i + '%, 50%)';
   }
 
-  ctx.fillRect(CLOUD_COORDX + GAP + (GAP + COLUMN_WIDTH) * i, CLOUD_HEIGHT - calculateHeight(times[i]) - GAP + INDENT, COLUMN_WIDTH, calculateHeight(times[i]));
+  ctx.fillRect(CLOUD_COORDX + GAP + (GAP + COLUMN_WIDTH) * i, CLOUD_HEIGHT - calculateHeight(time) - GAP + INDENT, COLUMN_WIDTH, calculateHeight(time));
 };
 
 window.renderStatistics = function (ctx, names, times) {
@@ -50,8 +50,8 @@ window.renderStatistics = function (ctx, names, times) {
 
     ctx.fillStyle = '#000';
     ctx.fillText(names[i], CLOUD_COORDX + GAP + (GAP + COLUMN_WIDTH) * i, CLOUD_HEIGHT - CLOUD_COORDY);
-    ctx.fillText(itemTimes, CLOUD_COORDX + GAP + (GAP + COLUMN_WIDTH) * i, CLOUD_HEIGHT - calculateHeight(times[i]) - GAP + INDENT);
+    ctx.fillText(itemTimes, CLOUD_COORDX + GAP + (GAP + COLUMN_WIDTH) * i, CLOUD_HEIGHT - calculateHeight(itemTimes) - GAP + INDENT);
 
-    drawRect(ctx, names, times, i);
+    drawRect(ctx, names, itemTimes, i);
   }
 };
