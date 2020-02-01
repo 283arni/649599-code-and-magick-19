@@ -11,6 +11,8 @@ var wizardSetupCoat = blockSetup.querySelector('.setup-wizard .wizard-coat');
 var wizardSetupEyes = blockSetup.querySelector('.setup-wizard .wizard-eyes');
 var wizardSetupFireboll = blockSetup.querySelector('.setup-fireball-wrap');
 var inputHidden = wizardSetupFireboll.querySelector('input');
+var form = blockSetup.querySelector('form');
+var btnSubmit = form.querySelector('.setup-submit');
 
 var firstNames = ['Иван', 'Хуан Себастьян', 'Мария', 'Кристоф', 'Виктор', 'Юлия', 'Люпита', 'Вашингтон'];
 var secondNames = ['да Марья', 'Верон', 'Мирабелла', 'Вальц', 'Онопко', 'Топольницкая', 'Нионго', 'Ирвинг'];
@@ -28,6 +30,21 @@ var onPopupEsc = function (e) {
   }
 };
 
+var onFormSubmit = function (e) {
+
+  e.preventDefault();
+
+  btnSubmit.addEventListener('mouseup', function () {
+    form.submit();
+  });
+
+  btnSubmit.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Enter') {
+      form.submit();
+    }
+  });
+};
+
 var openPopup = function () {
   blockSetup.classList.remove('hidden');
   document.addEventListener('keydown', onPopupEsc);
@@ -35,6 +52,7 @@ var openPopup = function () {
   wizardSetupCoat.addEventListener('click', onSetupCoatClick);
   wizardSetupEyes.addEventListener('click', onSetupEyesClick);
   wizardSetupFireboll.addEventListener('click', onSetupFirebollCklick);
+  form.addEventListener('submit', onFormSubmit);
 };
 
 var closePopup = function () {
@@ -44,6 +62,7 @@ var closePopup = function () {
   wizardSetupCoat.removeEventListener('click', onSetupCoatClick);
   wizardSetupEyes.removeEventListener('click', onSetupEyesClick);
   wizardSetupFireboll.removeEventListener('click', onSetupFirebollCklick);
+  form.removeEventListener('submit', onFormSubmit);
 };
 
 var onInputNameInvalid = function () {
