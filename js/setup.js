@@ -1,11 +1,15 @@
 'use strict';
 
+var QUANTITY_WIZARD = 4;
+var ENTER_KEY = 'Enter';
+var ESC_KEY = 'Escape';
+
 var blockSetup = document.querySelector('.setup');
 var listWizards = document.querySelector('.setup-similar-list');
 var similar = document.querySelector('.setup-similar');
 var setupOpen = document.querySelector('.setup-open');
-var setupClose = blockSetup.querySelector('.setup-close');
 var iconUser = document.querySelector('.setup-open-icon');
+var setupClose = blockSetup.querySelector('.setup-close');
 var inputName = blockSetup.querySelector('.setup-user-name');
 var wizardSetupCoat = blockSetup.querySelector('.setup-wizard .wizard-coat');
 var wizardSetupEyes = blockSetup.querySelector('.setup-wizard .wizard-eyes');
@@ -19,13 +23,12 @@ var secondNames = ['да Марья', 'Верон', 'Мирабелла', 'Ва�
 var clothesColors = ['rgb(101, 137, 164)', 'rgb(241, 43, 107)', 'rgb(146, 100, 161)', 'rgb(56, 159, 117)', 'rgb(215, 210, 55)', 'rgb(0, 0, 0)'];
 var colorsForEyes = ['black', 'red', 'blue', 'yellow', 'green'];
 var colorsFireboll = ['#ee4830', '#30a8ee', '#5ce6c0', '#e848d5', '#e6e848'];
-var QUANTITY_WIZARD = 4;
 var wizards = [];
 
 // События
 
 var onPopupEsc = function (e) {
-  if (e.key === 'Escape') {
+  if (e.key === ESC_KEY) {
     closePopup();
   }
 };
@@ -39,7 +42,7 @@ var onFormSubmit = function (e) {
   });
 
   btnSubmit.addEventListener('keydown', function (evt) {
-    if (evt.key === 'Enter') {
+    if (evt.key === ENTER_KEY) {
       form.submit();
     }
   });
@@ -96,13 +99,13 @@ setupClose.addEventListener('click', function () {
 });
 
 setupClose.addEventListener('keydown', function (e) {
-  if (e.key === 'Enter') {
+  if (e.key === ENTER_KEY) {
     closePopup();
   }
 });
 
 iconUser.addEventListener('keydown', function (e) {
-  if (e.key === 'Enter') {
+  if (e.key === ENTER_KEY) {
     openPopup();
   }
 });
