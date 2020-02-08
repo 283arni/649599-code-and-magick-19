@@ -7,6 +7,7 @@
   var MIN_NAME_LENGTH = 2;
   var MAX_NAME_LENGTH = 25;
 
+  var template = document.querySelector('#similar-wizard-template').content;
   var blockSetup = document.querySelector('.setup');
   var listWizards = document.querySelector('.setup-similar-list');
   var similar = document.querySelector('.setup-similar');
@@ -21,12 +22,9 @@
   var form = blockSetup.querySelector('form');
   var btnSubmit = form.querySelector('.setup-submit');
 
-  var firstNames = ['Иван', 'Хуан Себастьян', 'Мария', 'Кристоф', 'Виктор', 'Юлия', 'Люпита', 'Вашингтон'];
-  var secondNames = ['да Марья', 'Верон', 'Мирабелла', 'Вальц', 'Онопко', 'Топольницкая', 'Нионго', 'Ирвинг'];
   var clothesColors = ['rgb(101, 137, 164)', 'rgb(241, 43, 107)', 'rgb(146, 100, 161)', 'rgb(56, 159, 117)', 'rgb(215, 210, 55)', 'rgb(0, 0, 0)'];
   var colorsForEyes = ['black', 'red', 'blue', 'yellow', 'green'];
   var colorsFireboll = ['#ee4830', '#30a8ee', '#5ce6c0', '#e848d5', '#e6e848'];
-  var wizards = [];
   var spaceBlockSetupX;
   var spaceBlockSetupY;
 
@@ -138,37 +136,75 @@
 
   // Создание магов
 
-  var creatElem = function (i, fragment, template) {
+  var creatElem = function (wizard) {
     var element = template.cloneNode(true);
     var nameWizard = element.querySelector('.setup-similar-label');
     var clothesWizardColor = element.querySelector('.wizard-coat');
     var eyesWizardColor = element.querySelector('.wizard-eyes');
 
-    nameWizard.textContent = wizards[i].name;
-    clothesWizardColor.style.fill = wizards[i].coatColor;
-    eyesWizardColor.style.fill = wizards[i].eyesColor;
+    nameWizard.textContent = wizard.name;
+    clothesWizardColor.style.fill = wizard.colorCoat;
+    eyesWizardColor.style.fill = wizard.colorEyes;
 
-    fragment.append(element);
+    return element;
   };
 
-  var addWizarts = function () {
+  var onLoad = function (army) {
 
-    var template = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item');
     var fragment = document.createDocumentFragment();
 
     for (var i = 0; i < QUANTITY_WIZARD; i++) {
-      wizards.push({
-        name: firstNames[randomSelection(firstNames)] + ' ' + secondNames[randomSelection(secondNames)],
-        coatColor: clothesColors[randomSelection(clothesColors)],
-        eyesColor: colorsForEyes[randomSelection(colorsForEyes)]
-      });
-
-      creatElem(i, fragment, template);
+      fragment.append(creatElem(army[i]));
     }
 
-    return fragment;
+    listWizards.append(fragment);
   };
 
-  listWizards.append(addWizarts());
+  var onError = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; background-color: pink; border: 2px solid red; transform: translate(-50%, -50%); padding: 10px; text-align: center';
+    node.style.position = 'fixed';
+    node.style.left = '50%';
+    node.style.top = '50%';
+    node.style.fontSize = '30px';
+
+    node.textContent = filterError(errorMessage);
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  var filterError = function (errorMessage) {
+    switch (errorMessage) {
+      case 400:
+        errorMessage = 'Bad Request';
+        break;
+      case 403:
+        errorMessage = 'Доступ запрещен';
+        break;
+      case 404:
+        errorMessage = 'файл не найден';
+        break;
+      case 500:
+        errorMessage = 'ошибка сервера';
+        break;
+      case 502:
+        errorMessage = 'Bad Gateaway';
+        break;
+      default:
+        errorMessage = 'Неизвестная ошибка';
+    }
+    return 'Произошли проблемы: ' + errorMessage;
+  };
+
+  form.addEventListener('submit', function (e) {
+
+    e.preventDefault();
+
+    window.backend.send(new FormData(form), function () {
+      blockSetup.classList.add('hidden');
+    }, onError);
+
+  });
+
+  window.backend.load(onLoad, onError);
   similar.classList.remove('hidden');
 })();
