@@ -2,7 +2,6 @@
 
 (function () {
 
-  var ONE_SECOND = 100;
   var STATUS_OK = 200;
   var TIMEOUT = 10000;
 
@@ -11,8 +10,6 @@
 
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
-
-    xhr.open('GET', URL);
 
     xhr.addEventListener('load', function () {
       if (xhr.status === STATUS_OK) {
@@ -26,12 +23,12 @@
       onError('Произошла ошибка соединения');
     });
     xhr.addEventListener('timeout', function () {
-      onError('Запрос не успел выполниться за ' + xhr.timeout / ONE_SECOND + 'секунд');
+      onError('Запрос не успел выполниться за ' + TIMEOUT + 'мс');
     });
 
     xhr.timeout = TIMEOUT;
 
-
+    xhr.open('GET', URL);
     xhr.send();
   };
 
@@ -43,7 +40,7 @@
 
     xhr.addEventListener('load', function () {
       if (xhr.status === STATUS_OK) {
-        onLoad(xhr.response);
+        onLoad();
       } else {
         onError(xhr.status);
       }
