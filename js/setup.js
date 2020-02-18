@@ -1,15 +1,22 @@
 'use strict';
 
 (function () {
-  var QUANTITY_WIZARD = 4;
+
   var ENTER_KEY = 'Enter';
   var ESC_KEY = 'Escape';
   var MIN_NAME_LENGTH = 2;
   var MAX_NAME_LENGTH = 25;
 
-  var template = document.querySelector('#similar-wizard-template').content;
+  var statusesServer = {
+    400: 'Не верный запрос',
+    403: 'Доступ запрещен',
+    404: 'Файл не найден',
+    500: 'Ошибка сервера',
+    502: 'Проблемы на стороне сайта'
+  };
+
+
   var blockSetup = document.querySelector('.setup');
-  var listWizards = document.querySelector('.setup-similar-list');
   var similar = document.querySelector('.setup-similar');
   var setupOpen = document.querySelector('.setup-open');
   var iconUser = document.querySelector('.setup-open-icon');
@@ -27,8 +34,28 @@
   var colorsFireboll = ['#ee4830', '#30a8ee', '#5ce6c0', '#e848d5', '#e6e848'];
   var spaceBlockSetupX;
   var spaceBlockSetupY;
+  var coatColorSave;
+  var eyesColorSave;
+  var wizards = [];
 
-  // События
+  var updateWizards = function () {
+    window.wizards.renderWisards(wizards.sort(function (left, right) {
+      return getRank(right) - getRank(left);
+    }));
+  };
+
+  var getRank = function (wizard) {
+    var rank = 0;
+
+    if (wizard.colorCoat === coatColorSave) {
+      rank += 2;
+    }
+    if (wizard.colorEyes === eyesColorSave) {
+      rank += 1;
+    }
+
+    return rank;
+  };
 
   var onButtonSubnitEnter = function (e) {
     if (e.key === ENTER_KEY) {
@@ -56,6 +83,7 @@
   };
 
   var openPopup = function () {
+
     blockSetup.classList.remove('hidden');
     document.addEventListener('keydown', onPopupEsc);
     inputName.addEventListener('input', onNameInput);
@@ -89,17 +117,54 @@
   };
 
   var onSetupCoatClick = function () {
-    wizardSetupCoat.style.fill = clothesColors[randomSelection(clothesColors)];
+    coatColorSave = clothesColors[randomSelection(clothesColors)];
+    wizardSetupCoat.style.fill = coatColorSave;
+    window.debounce(updateWizards);
   };
 
   var onSetupEyesClick = function () {
-    wizardSetupEyes.style.fill = colorsForEyes[randomSelection(colorsForEyes)];
+    eyesColorSave = colorsForEyes[randomSelection(colorsForEyes)];
+    wizardSetupEyes.style.fill = eyesColorSave;
+    window.debounce(updateWizards);
   };
 
   var onSetupFirebollCklick = function () {
     var randomColorFireboll = colorsFireboll[randomSelection(colorsFireboll)];
     wizardSetupFireboll.setAttribute('style', 'background: ' + randomColorFireboll);
     inputHidden.setAttribute('value', randomColorFireboll);
+  };
+
+  var randomSelection = function (arr) {
+    return Math.floor(Math.random() * arr.length);
+  };
+
+  var onLoad = function (army) {
+    wizards = army;
+    window.wizards.renderWisards(wizards);
+  };
+
+  var onError = function (errorMessage) {
+    var node = document.createElement('div');
+
+    node.style = 'z-index: 100; background-color: pink; border: 2px solid red; transform: translate(-50%, -50%); padding: 10px; text-align: center';
+    node.style.position = 'fixed';
+    node.style.left = '50%';
+    node.style.top = '50%';
+    node.style.fontSize = '30px';
+    node.textContent = filterError(errorMessage);
+
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  var filterError = function (errorMessage) {
+
+    if (statusesServer[errorMessage]) {
+      errorMessage = statusesServer[errorMessage];
+    } else {
+      errorMessage = 'Неизвестная ошибка';
+    }
+
+    return 'Произошли проблемы: ' + errorMessage;
   };
 
   setupOpen.addEventListener('click', function () {
@@ -127,73 +192,6 @@
       e.preventDefault();
     }
   });
-
-  // Случайный выбор из массивов
-
-  var randomSelection = function (arr) {
-    return Math.floor(Math.random() * arr.length);
-  };
-
-  // Создание магов
-
-  var creatElem = function (wizard) {
-    var element = template.cloneNode(true);
-    var nameWizard = element.querySelector('.setup-similar-label');
-    var clothesWizardColor = element.querySelector('.wizard-coat');
-    var eyesWizardColor = element.querySelector('.wizard-eyes');
-
-    nameWizard.textContent = wizard.name;
-    clothesWizardColor.style.fill = wizard.colorCoat;
-    eyesWizardColor.style.fill = wizard.colorEyes;
-
-    return element;
-  };
-
-  var onLoad = function (army) {
-
-    var fragment = document.createDocumentFragment();
-
-    for (var i = 0; i < QUANTITY_WIZARD; i++) {
-      fragment.append(creatElem(army[i]));
-    }
-
-    listWizards.append(fragment);
-  };
-
-  var onError = function (errorMessage) {
-    var node = document.createElement('div');
-    node.style = 'z-index: 100; background-color: pink; border: 2px solid red; transform: translate(-50%, -50%); padding: 10px; text-align: center';
-    node.style.position = 'fixed';
-    node.style.left = '50%';
-    node.style.top = '50%';
-    node.style.fontSize = '30px';
-
-    node.textContent = filterError(errorMessage);
-    document.body.insertAdjacentElement('afterbegin', node);
-  };
-
-  var filterError = function (errorMessage) {
-    switch (errorMessage) {
-      case 400:
-        errorMessage = 'Bad Request';
-        break;
-      case 403:
-        errorMessage = 'Доступ запрещен';
-        break;
-      case 404:
-        errorMessage = 'файл не найден';
-        break;
-      case 500:
-        errorMessage = 'ошибка сервера';
-        break;
-      case 502:
-        errorMessage = 'Bad Gateaway';
-        break;
-      default:
-        errorMessage = 'Неизвестная ошибка';
-    }
-    return 'Произошли проблемы: ' + errorMessage;
-  };
 
   form.addEventListener('submit', function (e) {
 
