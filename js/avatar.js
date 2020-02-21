@@ -8,9 +8,9 @@
 
   fileBox.addEventListener('change', function () {
     var file = fileBox.files[0];
-    var fileName = file.name.toLowerCase();
 
     if (file) {
+      var fileName = file.name.toLowerCase();
       var matches = FILE_FORMATS.some(function (item) {
         return fileName.endsWith(item);
       });
